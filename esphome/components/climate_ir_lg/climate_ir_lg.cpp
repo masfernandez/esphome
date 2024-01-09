@@ -34,7 +34,6 @@ const uint16_t BITS = 28;
 void LgIrClimate::transmit_state() {
   uint32_t remote_state = 0x8800000;
 
-  // ESP_LOGD(TAG, "climate_lg_ir mode_before_ code: 0x%02X", modeBefore_);
   if (send_swing_cmd_) {
     send_swing_cmd_ = false;
     remote_state |= COMMAND_SWING;
@@ -91,8 +90,8 @@ void LgIrClimate::transmit_state() {
 
     if (this->mode == climate::CLIMATE_MODE_HEAT_COOL) {
       this->fan_mode = climate::CLIMATE_FAN_AUTO;
-      // remote_state |= FAN_MODE_AUTO_DRY;
     }
+
     if (this->mode == climate::CLIMATE_MODE_COOL || this->mode == climate::CLIMATE_MODE_HEAT) {
       auto temp = (uint8_t) roundf(clamp<float>(this->target_temperature, TEMP_MIN, TEMP_MAX));
       remote_state |= ((temp - 15) << TEMP_SHIFT);
