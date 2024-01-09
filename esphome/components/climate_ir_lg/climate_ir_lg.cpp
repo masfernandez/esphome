@@ -42,7 +42,7 @@ void LgIrClimate::transmit_state() {
       remote_state |= COMMAND_ON_AI;
     } else if (mode_before_ == climate::CLIMATE_MODE_OFF && this->mode != climate::CLIMATE_MODE_OFF) {
       remote_state |= COMMAND_ON;
-      this->mode = climate::CLIMATE_MODE_COOL;
+      //this->mode = climate::CLIMATE_MODE_COOL;
     } else {
       switch (this->mode) {
         case climate::CLIMATE_MODE_COOL:
@@ -125,7 +125,7 @@ bool LgIrClimate::on_receive(remote_base::RemoteReceiveData data) {
     return false;
 
   if ((remote_state & COMMAND_MASK) == COMMAND_ON) {
-    this->mode = climate::CLIMATE_MODE_COOL;
+    //this->mode = climate::CLIMATE_MODE_COOL;
   } else if ((remote_state & COMMAND_MASK) == COMMAND_ON_AI) {
     this->mode = climate::CLIMATE_MODE_HEAT_COOL;
   }
@@ -143,7 +143,7 @@ bool LgIrClimate::on_receive(remote_base::RemoteReceiveData data) {
     } else if ((remote_state & COMMAND_MASK) == COMMAND_HEAT) {
       this->mode = climate::CLIMATE_MODE_HEAT;
     } else {
-      this->mode = climate::CLIMATE_MODE_COOL;
+      //this->mode = climate::CLIMATE_MODE_COOL;
     }
 
     // Temperature
