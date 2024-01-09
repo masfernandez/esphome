@@ -34,6 +34,7 @@ const uint16_t BITS = 28;
 void LgIrClimate::transmit_state() {
   uint32_t remote_state = 0x8800000;
 
+  ESP_LOGD(TAG, "climate_lg_ir mode_before_ code: 0x%02X", modeBefore_);
   if (send_swing_cmd_) {
     send_swing_cmd_ = false;
     remote_state |= COMMAND_SWING;
@@ -42,7 +43,7 @@ void LgIrClimate::transmit_state() {
       remote_state |= COMMAND_ON_AI;
     } else if (mode_before_ == climate::CLIMATE_MODE_OFF && this->mode != climate::CLIMATE_MODE_OFF) {
       remote_state |= COMMAND_ON;
-      //this->mode = climate::CLIMATE_MODE_COOL;
+      this->mode = climate::CLIMATE_MODE_COOL;
     } else {
       switch (this->mode) {
         case climate::CLIMATE_MODE_COOL:
@@ -69,8 +70,7 @@ void LgIrClimate::transmit_state() {
 
     if (this->mode == climate::CLIMATE_MODE_OFF) {
       remote_state |= FAN_AUTO;
-    } else if (this->mode == climate::CLIMATE_MODE_COOL || this->mode == climate::CLIMATE_MODE_DRY ||
-               this->mode == climate::CLIMATE_MODE_HEAT) {
+    } else if (this->mode == climate::CLIMATE_MODE_COOL || this->mode == climate::CLIMATE_MODE_DRY || this->mode == climate::CLIMATE_MODE_HEAT) {
       switch (this->fan_mode.value()) {
         case climate::CLIMATE_FAN_HIGH:
           remote_state |= FAN_MAX;
@@ -90,8 +90,8 @@ void LgIrClimate::transmit_state() {
 
     if (this->mode == climate::CLIMATE_MODE_HEAT_COOL) {
       this->fan_mode = climate::CLIMATE_FAN_AUTO;
+      // remote_state |= FAN_MODE_AUTO_DRY;
     }
-
     if (this->mode == climate::CLIMATE_MODE_COOL || this->mode == climate::CLIMATE_MODE_HEAT) {
       auto temp = (uint8_t) roundf(clamp<float>(this->target_temperature, TEMP_MIN, TEMP_MAX));
       remote_state |= ((temp - 15) << TEMP_SHIFT);
@@ -125,7 +125,7 @@ bool LgIrClimate::on_receive(remote_base::RemoteReceiveData data) {
     return false;
 
   if ((remote_state & COMMAND_MASK) == COMMAND_ON) {
-    //this->mode = climate::CLIMATE_MODE_COOL;
+    this->mode = climate::CLIMATE_MODE_COOL;
   } else if ((remote_state & COMMAND_MASK) == COMMAND_ON_AI) {
     this->mode = climate::CLIMATE_MODE_HEAT_COOL;
   }
@@ -143,7 +143,7 @@ bool LgIrClimate::on_receive(remote_base::RemoteReceiveData data) {
     } else if ((remote_state & COMMAND_MASK) == COMMAND_HEAT) {
       this->mode = climate::CLIMATE_MODE_HEAT;
     } else {
-      //this->mode = climate::CLIMATE_MODE_COOL;
+      this->mode = climate::CLIMATE_MODE_COOL;
     }
 
     // Temperature
